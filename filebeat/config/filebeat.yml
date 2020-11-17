@@ -6,6 +6,9 @@ filebeat:
     - input_type: log
       paths:
         - /var/log/*.log
+    - input_type: stdin
+      paths:
+        - /var/log/*.log
 
 output.logstash:
   hosts: ["logstash:5044"]
