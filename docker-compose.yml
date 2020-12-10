@@ -20,6 +20,7 @@ services:
     environment:
       ES_JAVA_OPTS: "-Xmx2g -Xms2g"
       ELASTIC_PASSWORD: changeme
+      TZ: Asia/Shanghai
       # Use single node discovery in order to disable production mode and avoid bootstrap checks.
       # see: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
       discovery.type: single-node
@@ -45,6 +46,8 @@ services:
       - "5000:5000/tcp"
       - "5000:5000/udp"
       - "9600:9600"
+    environment:
+      TZ: Asia/Shanghai
     networks:
       - elk
     depends_on:
@@ -62,6 +65,8 @@ services:
         read_only: true
     ports:
       - "5601:5601"
+    environment:
+      TZ: Asia/Shanghai
     networks:
       - elk
     depends_on:
@@ -83,6 +88,8 @@ services:
         source: $LOGS_PATH
         target: /var/log
         read_only: true
+    environment:
+      TZ: Asia/Shanghai
     networks:
       - elk
     links:
