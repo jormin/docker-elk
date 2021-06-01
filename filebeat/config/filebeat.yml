@@ -3,32 +3,72 @@ setup.kibana:
 
 filebeat:
   inputs:
+    # fetcher
     - type: log
       enabled: true
       paths:
         - /var/log/fetcher/*/*.log
       fields: 
         source: fetcher
+    # licaidaily
     - type: log
       enabled: true
       paths:
         - /var/log/licaidaily/*/*.log
       fields: 
         source: licaidaily
+    # go-tools
     - type: log
       enabled: true
       paths:
         - /var/log/go-tools/*/*.log
       fields: 
         source: go-tools
+    # nginx
+    - type: log
+      enabled: true
+      paths:
+        - /var/log/nginx/*.log
+      fields: 
+        source: nginx
+    # gw-shop-v1-log
+    - type: log
+      enabled: true
+      paths:
+        - /var/log/gw-shop-v1/*/*/*/*.log
+      fields: 
+        source: gw-shop-v1-log
+    # gw-shop-v1-sql
+    - type: log
+      enabled: true
+      paths:
+        - /var/log/gw-shop-v1/*/*/*/*.txt
+      fields: 
+        source: gw-shop-v1-sql
+    # callback
+    - type: log
+      enabled: true
+      paths:
+        - /var/log/callback/*/*/*/*.log
+      fields: 
+        source: callback
 
 processors:
-  - decode_json_fields:
-      fields: [message] # 要进行解析的字段
-      target: "" # json内容解析到指定的字段，如果为空（“”），则解析到顶级结构下
-      process_array: false # 如果解析出的json结构中某个字段在原始的event（在filebeat中传输的一条数据为一个event）中也存在，是否覆盖event中该字段的值，默认值:false
-      process_array: false # 数组是否解码，默认值:false
-      max_depth: 1 # 解码深度，默认值：1
+  # - decode_json_fields:
+  #     fields: ["message"] # 要进行解析的字段
+  #     target: "content" # json内容解析到指定的字段，如果为空（“”），则解析到顶级结构下
+  #     process_array: false # 数组是否解码，默认值:false
+  #     max_depth: 1 # 解码深度，默认值：1
+  # - timestamp:
+  #     # 格式化时间值给时间戳 
+  #     # field: content.time
+  #     # 使用我国东八区时间  格式化log时间
+  #     timezone: Asia/Shanghai
+  #     layouts:
+  #       - '2006-01-02 15:04:05'
+  #       - '2006-01-02 15:04:05.999'
+  #     test:
+  #       - '2019-06-22 16:33:51'
       
 output.logstash:
   hosts: ["logstash:5044"]

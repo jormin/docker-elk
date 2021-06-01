@@ -2,10 +2,7 @@ version: '3.2'
 
 services:
   elasticsearch:
-    build:
-      context: elasticsearch/
-      args:
-        ELK_VERSION: $ELK_VERSION
+    image: elasticsearch:$ELK_VERSION
     volumes:
       - type: bind
         source: ./elasticsearch/config/elasticsearch.yml
@@ -18,20 +15,17 @@ services:
       - "9200:9200"
       - "9300:9300"
     environment:
-      ES_JAVA_OPTS: "-Xmx2g -Xms2g"
-      ELASTIC_PASSWORD: changeme
+      ES_JAVA_OPTS: "-Xmx1g -Xms1g"
+      ELASTIC_PASSWORD: krwcitygI6j83LiL0fYZ
       TZ: Asia/Shanghai
       # Use single node discovery in order to disable production mode and avoid bootstrap checks.
       # see: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
       discovery.type: single-node
     networks:
-      - elk
+      - devops
 
   logstash:
-    build:
-      context: logstash/
-      args:
-        ELK_VERSION: $ELK_VERSION
+    image: logstash:$ELK_VERSION
     volumes:
       - type: bind
         source: ./logstash/config/logstash.yml
@@ -41,6 +35,10 @@ services:
         source: ./logstash/pipeline
         target: /usr/share/logstash/pipeline
         read_only: true
+      - type: bind
+        source: /Users/Jormin/GeoIP
+        target: /usr/share/GeoIP
+        read_only: true
     ports:
       - "5044:5044"
       - "5000:5000/tcp"
@@ -49,15 +47,12 @@ services:
     environment:
       TZ: Asia/Shanghai
     networks:
-      - elk
+      - devops
     depends_on:
       - elasticsearch
 
   kibana:
-    build:
-      context: kibana/
-      args:
-        ELK_VERSION: $ELK_VERSION
+    image: kibana:$ELK_VERSION
     volumes:
       - type: bind
         source: ./kibana/config/kibana.yml
@@ -68,15 +63,12 @@ services:
     environment:
       TZ: Asia/Shanghai
     networks:
-      - elk
+      - devops
     depends_on:
       - elasticsearch
 
   filebeat:
-    build:
-      context: filebeat/
-      args:
-        ELK_VERSION: $ELK_VERSION
+    image: filebeat:$ELK_VERSION
     restart: "no"
     command: "filebeat -e -d *"
     volumes:
@@ -85,20 +77,30 @@ services:
         target: /usr/share/filebeat/filebeat.yml
         read_only: true
       - type: bind
-        source: $LOGS_PATH
+        source: /Users/Jormin/logs
         target: /var/log
-        read_only: true
+      - type: bind
+        source: /Users/Jormin/code/vchangyi/gw-shop-v1/src/storage/logs
+        target: /var/log/gw-shop-v1
+      - type: bind
+        source: /Users/Jormin/code/vchangyi/callback/src/storage/test-logs
+        target: /var/log/callback
+      - type: bind
+        source: /Users/Jormin/docker/docker-dev-php/nginx/logs
+        target: /var/log/nginx
     environment:
       TZ: Asia/Shanghai
     networks:
-      - elk
+      - devops
     links:
       - "logstash:logstash"
     depends_on:
       - logstash
       - elasticsearch
       - kibana
+    networks:
+      - devops
 
 networks:
-  elk:
-    driver: bridge
+  devops:
+    external: true

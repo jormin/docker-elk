@@ -10,6 +10,6 @@ monitoring.ui.container.elasticsearch.enabled: true
 ## X-Pack security credentials
 #
 elasticsearch.username: elastic
-elasticsearch.password: changeme
+elasticsearch.password: krwcitygI6j83LiL0fYZ
 
 i18n.locale: "zh-CN"
